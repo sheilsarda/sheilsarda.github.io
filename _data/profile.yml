@@ -1,0 +1,28 @@
+# Personal fields for the homepage. Edit this file to fill in the blanks.
+# Bio copy stays in _config.yml (description) and index.md.
+
+name: Sheil Sarda
+
+# Shown under the name. Format: name at domain dot com
+# Leave blank to hide the line.
+email: "sheil at moonlakeai dot com"
+
+photo: /assets/profile.jpg
+
+# Shown under the photo only when set. Example: Photo by Your Name
+credit: ""
+
+# One sentence. Leave blank to hide the paragraph.
+hobbies: ""
+
+# Drop a PDF at assets/cv.pdf and set the path to show a CV link.
+# Example: /assets/cv.pdf
+cv: ""
+
+links:
+  - label: GitHub
+    url: https://github.com/sheilsarda
+  - label: LinkedIn
+    url: https://linkedin.com/in/sheilsarda
+  - label: Substack
+    url: https://sheilsarda.substack.com

@@ -1,0 +1,211 @@
+---
+title: "Scoring the loop: a three-axis scorecard for robot foundation models and the markets they fit"
+short_title: "Scoring the loop"
+date: 2026-06-14
+slug: scoring-the-loop
+description: "A MECE framework for grading robot foundation models on data economics, control economics, and capability, each with a single benchmark KPI, a filled-in scorecard across seven labs, and the end-markets each profile actually unlocks."
+---
+
+## Glossary
+
+**Vision-language-action model (VLA).** A single network mapping camera images and a language instruction to robot actions. RT-2 and OpenVLA are the reference points. What decides deployability is what runs underneath to turn the output into motion at control rate.
+
+**Dual-system stack (S2/S1/S0).** A decomposition by rate. S2 is a slow vision-language model reasoning about scene and task, 5 to 10 Hz. S1 is a fast visuomotor policy, 100 to 200 Hz. S0 is low-level control, around 1 kHz. Figure's Helix runs S2 at 7 to 9 Hz and S1 at 200 Hz, and Helix 02 adds S0 at 1 kHz.
+
+**Action chunking and flow matching.** Action chunking predicts a short horizon of future actions in one inference pass, then executes the chunk before predicting the next. Flow matching is a continuous-action generation method, a close cousin of diffusion, that emits those chunks without discretizing the action space. Physical Intelligence's action expert pairs the two at up to 50 Hz.
+
+**Real-time chunking (RTC).** Physical Intelligence's inference scheme that generates the next chunk while the current one is still executing, so the loop does not stall on the model. It holds up under inference delays above 300 ms.
+
+**Inverse dynamics model (IDM).** The component that reads a predicted state transition, two frames or a short clip, and outputs the action that causes it. The bridge from predicted pixels to motor commands.
+
+**World Action Model (WAM).** A model that predicts future video and the actions that produce it jointly, inside one network, rather than bolting an action decoder onto a separate video model. DreamZero is the reference implementation; Rhoda's two-box Direct Video-Action is the split-network version of the same thesis.
+
+**Evidence grade.** Not a property of the robot, a property of the public record. Whether a claim is backed by open weights and a peer-reviewed eval, a blog with numbers, an uncut demo, or nothing.
+
+![Rate stack: where each company closes the loop]({{ site.baseurl }}/assets/posts/model-scorecards/option3/rate-stack-ladder.png)
+
+
+## Why the old scorecard was the wrong shape
+
+I graded these companies once before, on three lenses: loop legibility, action representation, and data economics. The framework worked as a narrative, but it was not MECE, and the seam shows under load. Loop legibility is not a peer of the other two. It overlaps both, because legibility is just the question of whether the data economics and the action representation are disclosed at all. You cannot put "is it disclosed" on the same axis as "what is it" without double-counting.
+
+The fix is to separate substance from evidence. A robot foundation model is a closed loop: data trains an artifact, the artifact runs at some rate, and that produces outcomes. Every technical metric that matters lives in exactly one stage of that pipeline, which is what makes the spine mutually exclusive and collectively exhaustive. Three axes: data economics, control economics, demonstrated capability. What a model is and what it costs to run are the same stage seen from two ends, so they collapse into one axis rather than two. Then one dimension cuts orthogonally across all three, the evidence grade, which is where the old "legibility" lens actually belonged. You score what a company does on the three axes, and how much you can trust each claim separately. Each of the two cost axes gets a single benchmark KPI, so the scorecard ranks on numbers rather than adjectives.
+
+The payoff is the third question, the one the first post only gestured at. Once the axes are clean, each one maps onto a property of the task, and the metric profile of a company tells you which end-market it is actually built for. That mapping is the back half of this post.
+
+## The metrics that matter
+
+The first axis is **data economics**, and it is the axis where the obvious metric is the wrong one. The instinct is to grade on corpus size, and on raw scale Generalist wins outright: GEN-0 pretrained on more than 270,000 hours of manipulation data growing about 10,000 hours a week. But corpus size is a stock, not a unit cost, and it says nothing about what the next task costs. The metric that does, and the one I want to crown for this axis, is **marginal task cost: the action-labeled robot-hours required to onboard one new task**. Action labels are the expensive part, because each labeled hour is a human teleoperating a robot in real time, and the field's whole data problem is that you cannot download that hour. So the winning move here is not the biggest corpus, it is the lowest action-label tax on the marginal task.
+
+By that one metric DreamZero leads the field. A brand new robot onboards on 30 minutes of play, and an unseen task on 10 to 20 minutes of video-only demonstration with no action labels at all (arXiv 2602.15922), which is roughly zero teleop-hours per new task. Generalist's GEN-1 adapts a task on one hour of robot data. Rhoda post-trains a task on 10 to 20 hours, its decanting policy on 11 and container breakdown on 17, but it trains the video model on hundreds of millions of unlabeled internet videos with an inverse dynamics model that learns from random, non-expert motion, so most of those hours carry no teleoperation cost. TRI reports an 80 percent cut in per-task data from multitask pretraining but no absolute number. Physical Intelligence, Dyna, and Skild do not disclose a per-task figure at all. Ranked on the single metric, the order is unambiguous at the top and blank at the bottom, which is itself the finding.
+
+| Company | Marginal task cost (action-labeled robot-hrs / new task) | Pretraining substrate | Source |
+|---|---|---|---|
+| NVIDIA GEAR (DreamZero) | ~0 (10-20 min video-only, no labels) | 500 hrs teleop / 22 envs | arXiv 2602.15922 |
+| Generalist AI | ~1 hr | 270k+ hrs (+10k/wk) | Generalist, Apr. 2026 |
+| Rhoda AI | 10-20 hr, mostly unlabeled prior + non-expert IDM | ~10^8 internet videos | Rhoda, Mar. 2026 |
+| Toyota Research Institute | ~80% cut vs baseline, no absolute [E] | multitask teleop corpus | arXiv 2507.05331 |
+| Physical Intelligence | N/A, moderate and undisclosed | teleop corpus | arXiv 2410.24164 |
+| Dyna Robotics | N/A, self-generated reward data | undisclosed | PR, Apr. 2025 |
+| Skild AI | N/A | human video + sim | undisclosed |
+
+The table reframes the field. The two companies with the largest disclosed corpora, Generalist and Rhoda, are not the ones with the cheapest marginal task, and the company that wins the metric does it by paying in minutes of unlabeled video instead of hours of teleoperation. Corpus scale and marginal task cost are different axes, and only the second one tells you whether a company can afford the long tail.
+
+The second axis is **control economics**, and it merges what a model is with what it costs to run, because those are the same fact seen from two ends. The architecture is the cause and the run cost is the effect, so grading them apart double-counts. Physical Intelligence's π0 (arXiv 2410.24164) pairs a 3B vision-language backbone with a flow-matching action expert producing continuous chunks, and π0.5 (arXiv 2504.16054) adds a two-level pass that writes the next subtask in language before the expert produces commands. DreamZero collapses the two boxes of Rhoda's Direct Video-Action into one 14B autoregressive diffusion transformer with a joint video-and-action flow-matching objective, so the inverse dynamics fall out of the same network that predicts frames. Toyota Research Institute's Large Behavior Models (arXiv 2507.05331) sit in between, a multitask diffusion transformer predicting 1.6-second chunks. Each choice prices itself out at the loop: a 3B action expert runs on one consumer card, a 14B video model does not.
+
+![π0 VLM plus flow-matching action expert (Black et al.)]({{ site.baseurl }}/assets/posts/model-scorecards/option3/pi0-architecture-paper.png)
+
+
+The KPI that prices the architecture is **control cost: the sustained control rate per deployable accelerator, in Hz per GPU, qualified by hardware class**. This is the axis that separates a demo from a deployment. At Fulfil we run a planning and controls stack over more than 20,000 SKUs, and the question that decides whether a model ships is never the success rate in the highlight reel. It is what happens to the loop when inference is slow, when the network adds latency, and when the action the model proposed is half-executed and the world has already moved. By the KPI, Physical Intelligence leads and is alone in disclosing the whole budget. Real-Time Execution of Action Chunking Flow Policies (arXiv 2506.07339, NeurIPS 2025) generates the next chunk while the current one executes, holds up under delays above 300 ms at roughly 97 ms of model latency, and hits 50 Hz on a single RTX 5090, weights released through openpi. DreamZero is the opposite end: 7 Hz only on two GB200s, which is 3.5 Hz per GPU on datacenter silicon, after a 38x optimization pass that cut latency from 5.7 seconds to 150 ms per chunk, and its own paper concedes a plain VLA clears 20 Hz on a single consumer GPU. Hardware class is the gate the whole field is stuck behind.
+
+| Company | Control cost (sustained Hz / deployable accelerator) | Hardware class | Latency / robustness | Source |
+|---|---|---|---|---|
+| Physical Intelligence | 50 Hz / 1 GPU | consumer (RTX 5090) | RTC 97 ms, holds >300 ms delay | arXiv 2506.07339 |
+| Toyota Research Institute | dexterous, rate not disclosed [E] | unspecified | 1.6 s action chunks | arXiv 2507.05331 |
+| Dyna Robotics | runs 24/7, Hz N/A | edge (inferred) | N/A | PR, Apr. 2025 |
+| Rhoda AI | ~10 Hz [E] | undisclosed | N/A | analyst est. |
+| Generalist AI | N/A, loop named not specified | undisclosed | N/A | Generalist, Apr. 2026 |
+| NVIDIA GEAR (DreamZero) | 3.5 Hz / GPU (7 Hz on 2x GB200) | datacenter (GB200) | 150 ms/chunk after 38x | arXiv 2602.15922 |
+| Skild AI | N/A | undisclosed | N/A | undisclosed |
+
+Set this table beside the data-economics one and the anti-diagonal is explicit. DreamZero tops marginal task cost and bottoms control cost, Physical Intelligence does the reverse, and the two KPIs are the two clocks the rest of this post turns on.
+
+![Real-time execution of action chunking flow policies (Black et al., NeurIPS 2025)]({{ site.baseurl }}/assets/posts/model-scorecards/option2/rtc-paper.png)
+
+
+The third axis is **demonstrated capability**, and the sub-metrics matter more than the headline number: in-distribution success on a shared benchmark rather than a self-chosen task, out-of-distribution generalization to unseen objects and tasks, cross-embodiment transfer, and autonomy over time. The distinction between a shared benchmark and a self-chosen one is the whole game. Dyna's DYNA-1 folding napkins at 99.4% over a 24-hour autonomous run is the strongest autonomy signal in the field, and it is also a self-run demo on a task the company picked. DreamZero is the opposite: 62.2% average task progress against 27.4% for the best pretrained VLA baseline, 39.5% on tasks entirely absent from training where from-scratch VLAs score under one percent, benchmarked head to head against π0.5 and GR00T N1.6 on shared AgiBot and DROID tasks, with a robot-to-robot and a human-to-robot transfer posted on the same eval. One is a robustness claim you take on faith, the other is a generalization claim you can check.
+
+![DreamZero World Action Model closed-loop architecture (Ye et al.)]({{ site.baseurl }}/assets/posts/model-scorecards/option3/dreamzero-wam-paper.png)
+
+
+Then the orthogonal dimension. **Evidence grade** runs from open weights with a peer-reviewed eval, down through a blog with numbers, down through an uncut demo, down to nothing disclosed. It is not a fourth axis, it is a confidence interval on the other three. A company can post a strong value on data economics and a blank on control economics, and the evidence grade is what stops you from averaging the two into a number that means nothing.
+
+## The scorecard
+
+Each cell carries the disclosed value and, in parentheses, a grade for that axis. The final column is the evidence grade across the row, the orthogonal read.
+
+| Company | A. Data economics | B. Control economics | C. Capability | Evidence |
+|---|---|---|---|---|
+| **Physical Intelligence** | marginal task cost moderate; teleop corpus, multitask pretrain cuts per-task data (B) | 3B VLA + flow-matched chunks + RTC; 50 Hz on 1 RTX 5090, holds >300 ms delay (A) | dexterous laundry/open-world, π0.5 is the shared-benchmark baseline (A) | **A** open weights (openpi), arXiv |
+| **NVIDIA GEAR (DreamZero)** | marginal task cost ~0 labeled hrs; 500 hrs teleop/22 envs pretrain, new task on 10-20 min video-only, no labels (A) | 14B autoregressive video-action DiT on Wan2.1; 7 Hz on 2x GB200 (3.5 Hz/GPU), edge is future work (C) | 62.2% vs 27.4%; 39.5% vs <1% unseen; cross-embodiment, shared AgiBot/DROID (A) | **A** open weights, code, eval sets |
+| **Generalist AI** | marginal task cost ~1 labeled hr/task; GEN-0 270k hrs (+10k/wk), base = wearable gloves, scaling laws (A-) | Harmonic Reasoning, paged attention; loop named, Hz and hardware undisclosed (D) | GEN-1 99% vs prior 64%, ~3x speed, self-reported not shared (C) | **C** blog with numbers |
+| **Toyota Research Institute** | multitask pretrain cuts per-task data ~80% (B) | multitask diffusion transformer, 1.6 s chunks; dexterous without exotic hardware, rate not disclosed (B+) | careful examination, rigorous multitask eval methodology (A) | **A-** arXiv, methodical study |
+| **Rhoda AI** | ~10^8 internet videos, IDM on random motion, 10-20 hr/task (A, conceptual) | Direct Video-Action, causal video model + separate IDM; on-robot rate/hardware undisclosed, ~10 Hz analyst est. (D) | uncut demos (decanting, breakdown, returns, sort, pack), no shared table (D) | **C-** research post + demos, blank on loop |
+| **Dyna Robotics** | scalable reward model self-generates training data; marginal cost undisclosed (C) | no model card, no rate stack; runs 24/7 on edge, Hz undisclosed (F) | DYNA-1 99.4% over 24 h autonomous, self-chosen task (B on autonomy) | **D** one number + demo |
+| **Skild AI** | human video + large-scale sim, no marginal numbers (D) | omni-bodied in-context, no rate stack or action rep, undisclosed (F) | no benchmark table, no model card (F) | **F** undisclosed, ~$14B valuation |
+
+Two reads come off the same matrix. The substance read is which company posts the strongest disclosed value on a given axis: DreamZero on data economics by the marginal-task-cost metric and on capability, Physical Intelligence on control economics by the control-cost metric, Generalist on raw corpus scale alone. The evidence read is how much of the row you can underwrite: Physical Intelligence and NVIDIA at the top, Skild at the bottom with the highest valuation in the table and the least disclosure. A company that scores well on substance and badly on evidence, like Rhoda, is not a weak company. It is an unauditable one, which is a different and more honest thing to say.
+
+The interesting pattern is that no single company sweeps. The two open labs, Physical Intelligence and NVIDIA, split the field on the two cost axes: PI owns control economics, NVIDIA owns capability and data economics, and they are attacking from opposite paradigms. That split is not noise. It is the structure of the end-market question.
+
+## The two clocks
+
+The scorecard ranks companies axis by axis, but it hides the tradeoff they are all making. The two cost axes are the ones that decide whether a company can scale, and each already has its KPI. Reframe each as a clock. The learning clock is the marginal task cost from the data-economics axis, the action-labeled robot-hours it takes to onboard a new task. The control clock is the control cost from the control-economics axis, the sustained Hz per deployable accelerator. The two are orthogonal. A company's data cost does not predict its inference cost, which is exactly what makes them a clean 2x2.
+
+```
+                       CHEAP TO TEACH               EXPENSIVE TO TEACH
+                    (low data cost / new task)    (pays for robot data)
+                  +-----------------------------+-----------------------------+
+  EXPENSIVE       |                             |                             |
+  TO RUN          |   X  DreamZero              |                             |
+  (datacenter,    |   X  Rhoda *                |        (loser corner)       |
+   ~2x GB200,     |                             |           empty             |
+   7 Hz)          |   [ video-prediction camp ] |                             |
+                  |                             |                             |
+                  +-------- X Generalist * -----+-----------------------------+
+                  |                             |                             |
+  CHEAP           |   ★ THE FRONTIER            |   X  Physical Intelligence  |
+  TO RUN          |   cheap to teach AND run    |   X  TRI                    |
+  (edge / 1 GPU,  |   NO CONFIRMED OCCUPANT     |                             |
+   ~50 Hz)        |                             |   [ flow-matching VLA camp ]|
+                  |                             |                             |
+                  +------------ X Dyna * -------+-----------------------------+
+
+  *  one clock undisclosed; placement inferred, sits on the border not the corner
+  Skild AI: off-map. Neither clock disclosed.
+```
+
+![The two clocks: where each robot foundation model pays its cost]({{ site.baseurl }}/assets/posts/model-scorecards/option3/two-clocks.png)
+
+
+The field splits across the anti-diagonal, and the split is the whole story. The video-prediction camp sits top-left, cheap to teach and expensive to run. DreamZero onboards a new robot on 30 minutes of play and an unseen task on 10 to 20 minutes of video, then pays for it at 7 Hz on two GB200s. Rhoda makes the same trade on 10 to 20 hours per task off an internet-video prior, though its run clock is an outside analyst's 10 Hz estimate rather than a disclosed number, so it sits on the border with a dashed mark. The flow-matching camp sits bottom-right, the mirror image. Physical Intelligence and TRI pay for teleoperation up front, then run the loop cheap, 50 Hz on a single RTX 5090 with RTC holding past 300 ms of delay.
+
+The placements that cannot be pinned are the revealing ones. Generalist onboards a task on one hour of robot data, which fixes it in the cheap-to-teach column, but it never specifies the loop to a control rate, so its control clock is unknown and it floats on the left border. Dyna runs deployed on edge hardware around the clock, which fixes its control clock cheap, but it has shown only one task, so the marginal cost of the next one is undisclosed and it floats on the bottom border. Skild discloses neither clock, so it cannot be placed at all, off-map at a $14B valuation.
+
+The corner that decides the field is empty. Nobody has confirmed a policy that is both cheap to teach and cheap to run. That empty frontier is the prediction the rest of this post builds toward. The company that reaches the bottom-left corner wins, and slow-propose, fast-comply is the explicit attempt to get there by stacking the top-left camp's data-cheap prior over the bottom-right camp's run-cheap loop.
+
+![DreamZero inference latency optimization (Ye et al.)]({{ site.baseurl }}/assets/posts/model-scorecards/option2/dreamzero-latency-paper.png)
+
+
+## The tasks each profile unlocks
+
+The three axes are not equally important for every task, and that is the point. The two cost axes map directly onto two properties of manipulation work, which lets the scorecard predict fit rather than just rank companies.
+
+Control economics, axis B, governs **cycle dynamics**: whether a task is quasi-static, where the world holds still long enough for a slow loop to catch up, or dynamic and high-speed, where success is decided by reactivity at control rate. Data economics, axis A, governs **task diversity**: whether the work is low-mix and repetitive, the same motion all shift, or high-mix and long-tail, a new object or task every few minutes. Contact-richness and tight tolerance overlay both as a difficulty multiplier, stressing the control loop and the data budget together. The 2x2 is the load-bearing map.
+
+| | Low-mix, repetitive | High-mix, long-tail |
+|---|---|---|
+| **Quasi-static** | 24/7 single-station (Dyna napkin fold, 99.4%/24 h) | warehouse pick, sort, returns (PI, Generalist, Rhoda's actual demos) |
+| **Dynamic, high-speed** | high-rate packaging lines | fast assembly, dynamic handling, the contested expansion case |
+
+The mapping rule is simple: a company's metric profile lights up the quadrant its strongest axis dominates. Strong data economics (cheap marginal task, no action labels) lights up the right column, the high-mix long-tail work where the cost of the next task is the binding constraint. This is exactly where Rhoda and DreamZero's data efficiency pays, and it is the column the warehouse market mostly lives in. Strong control economics (high Hz per deployable GPU, cheap hardware) lights up the bottom row, the dynamic high-speed work, which is precisely where DreamZero's 7-Hz-on-two-GB200s economics fail and where Physical Intelligence's RTC still wins. Strong cross-embodiment lights up multi-embodiment fleets and humanoids. Strong long-run autonomy lights up the top-left single-station cell, which is the cell Dyna already owns.
+
+The honest read of the market is that the top-right cell, high-mix quasi-static warehousing, is where Physical Intelligence, Dyna, Generalist, and Rhoda are all converging, because it is large, real, and tolerant of a slow loop. It is contested, not unlocked, by any one approach. The expansion case that would actually differentiate the video-prediction camp is the bottom row, high-speed contact-rich work, and that is exactly the row where video generation's inference cost is the binding constraint. The scorecard's control-economics axis is the gate on the most valuable unclaimed quadrant.
+
+![Toyota Research Institute Large Behavior Models (TRI et al.)]({{ site.baseurl }}/assets/posts/model-scorecards/option2/tri-lbm-paper.png)
+
+
+## Position sizing the next axis
+
+Collapse the scorecard into one diagnostic and the picture is clean. The three axes are not won by one company, and the evidence grade tells you which wins to trust. Physical Intelligence owns control economics with the only auditable latency budget in the field. NVIDIA's DreamZero owns capability and data economics with open weights, and proves the video-prediction thesis is real on shared benchmarks. Generalist owns the largest corpus but loses the marginal-task-cost metric and blanks the loop. Dyna owns autonomy on a self-chosen task. Skild owns a valuation and nothing else. The advantage that gets won next is on the axis where the two open leaders disagree, and the disagreement is not about whether video prediction generalizes. DreamZero settled that. It is about whether video prediction can close the loop on hardware you could bolt to a robot.
+
+That makes the prediction a single gate, and it is falsifiable. The pick today is Physical Intelligence, because the most valuable unclaimed quadrant is the bottom row, and the bottom row is decided by control economics, where PI leads and the video camp runs at 7 Hz on two datacenter GPUs. The pick flips when a video-prediction policy holds 10 Hz or better on a single consumer-class GPU rather than a pair of GB200s. Everything else the video camp needed, the shared-benchmark table, the cross-embodiment transfer, the data efficiency, it now has, ahead of schedule. The one thing it does not have is the deployment rate on deployable hardware, and the team that built DreamZero files edge deployment under future work.
+
+The bet I would actually make still sits between the two camps, and the scorecard is the argument for it. Put the data-economics winner on top, a video-prediction model proposing at low rate from the internet-video prior, and the real-time-loop winner underneath, a flow-matching controller closing the loop at 200 Hz. Slow-propose, fast-comply. NVIDIA labels DreamZero the other way, a System 1 it hopes to shrink onto an edge device, but its own economics, two GB200s for 7 Hz, are the strongest case I have seen that video generation belongs in the slow half of the stack, not the fast loop where the robot lives. The framework does not just grade the companies. It tells you which axis each one should be assigned to in the stack that finally ships.
+
+![Slow-propose, fast-comply hybrid control stack]({{ site.baseurl }}/assets/posts/model-scorecards/option3/slow-propose-fast-comply.png)
+
+
+## References
+
+Black, Kevin, et al. "π0: A Vision-Language-Action Flow Model for General Robot Control." *arXiv*, 31 Oct. 2024, arxiv.org/abs/2410.24164.
+
+Black, Kevin, et al. "Real-Time Execution of Action Chunking Flow Policies." *arXiv*, 7 June 2025, arxiv.org/abs/2506.07339.
+
+Brohan, Anthony, et al. "RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control." *arXiv*, 28 July 2023, arxiv.org/abs/2307.15818.
+
+Cheang, Chi-Lam, et al. "GR-2: A Generative Video-Language-Action Model with Web-Scale Knowledge for Robot Manipulation." *arXiv*, 8 Oct. 2024, arxiv.org/abs/2410.06158.
+
+Dyna Robotics. "Dyna Robotics Unveils DYNA-1." *PR Newswire*, 30 Apr. 2025, prnewswire.com/news-releases/dyna-robotics-unveils-dyna-1-the-first-commercial-ready-robot-foundation-model-offering-fully-autonomous-round-the-clock-dexterity-302441437.html.
+
+Figure AI. "Helix: A Vision-Language-Action Model for Generalist Humanoid Control." *Figure*, 20 Feb. 2025, figure.ai/news/helix.
+
+Generalist AI. "GEN-1: Scaling Embodied Foundation Models to Mastery." *Generalist*, 2 Apr. 2026, generalistai.com/blog/apr-02-2026-GEN-1.
+
+Kim, Moo Jin, et al. "OpenVLA: An Open-Source Vision-Language-Action Model." *arXiv*, 13 June 2024, arxiv.org/abs/2406.09246.
+
+NVIDIA. "GR00T N1: An Open Foundation Model for Generalist Humanoid Robots." *arXiv*, 18 Mar. 2025, arxiv.org/abs/2503.14734.
+
+Physical Intelligence, et al. "π0.5: a Vision-Language-Action Model with Open-World Generalization." *arXiv*, 22 Apr. 2025, arxiv.org/abs/2504.16054.
+
+Physical Intelligence, et al. "Knowledge Insulating Vision-Language-Action Models." *arXiv*, May 2025, arxiv.org/abs/2505.23705.
+
+Rhoda AI. "Causal Video Models Are Data-Efficient Robot Policy Learners." *Rhoda AI*, Mar. 2026, rhoda.ai/research.
+
+Toyota Research Institute. "A Careful Examination of Large Behavior Models for Multitask Dexterous Manipulation." *arXiv*, 7 July 2025, arxiv.org/abs/2507.05331.
+
+Ye, Seonghyeon, et al. "World Action Models are Zero-shot Policies." *arXiv*, 17 Feb. 2026, arxiv.org/abs/2602.15922.
+
+## Figures
+
+Black, Kevin, et al. "π0." *arXiv*, 31 Oct. 2024, arxiv.org/abs/2410.24164. Fig. 3 reproduced from arXiv PDF page 4 for commentary.
+
+Black, Kevin, et al. "Real-Time Execution of Action Chunking Flow Policies." *arXiv*, 7 June 2025, arxiv.org/abs/2506.07339. Figure 1 reproduced from arXiv PDF page 1 for commentary. NeurIPS 2025.
+
+Sarda, Sheil. "Rate Stack Ladder for Robot Foundation Models." *Diagram*, 2 June 2026. Robotics blog illustration.
+
+Sarda, Sheil. "Slow-Propose, Fast-Comply Hybrid Stack." *Diagram*, 2 June 2026. Robotics blog illustration.
+
+Toyota Research Institute. "A Careful Examination of Large Behavior Models." *arXiv*, 7 July 2025, arxiv.org/abs/2507.05331. Figure 9 reproduced from arXiv PDF page 12 for commentary.
+
+Ye, Seonghyeon, et al. "World Action Models are Zero-shot Policies." *arXiv*, 17 Feb. 2026, arxiv.org/abs/2602.15922. Figure 4 and the latency table reproduced from arXiv PDF pages 6 and 8 for commentary.

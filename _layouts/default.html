@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% assign person = site.data.profile.name | default: "Sheil Sarda" %}
+  <title>{% if page.title %}{{ page.title }} — {{ site.title }}{% else %}Sheil Sarda{% endif %}</title>
+  <meta name="description" content="{{ page.description | default: site.description }}">
+  <meta name="theme-color" content="#7C3AED">
+  <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,300;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+</head>
+<body>
+  {% assign home = '/' | relative_url %}
+  {% if page.url == "/" %}
+    {% assign profile_href = "#profile" %}
+    {% assign blog_href = "#blog" %}
+  {% else %}
+    {% assign profile_href = home | append: "#profile" %}
+    {% assign blog_href = home | append: "#blog" %}
+  {% endif %}
+  <nav id="header">
+    <a href="{{ profile_href }}">Home</a>
+    <a href="{{ blog_href }}">Blog</a>
+  </nav>
+  <div class="page">
+    <main>
+      {{ content }}
+    </main>
+    <footer class="site-footer">
+      <p class="footer-links">
+        {%- assign footer_sep = "" -%}
+        {%- for link in site.data.profile.links -%}
+          {{ footer_sep }}<a href="{{ link.url }}"{% if link.url contains "://" %} target="_blank" rel="noopener"{% endif %}>{{ link.label }}</a>
+          {%- assign footer_sep = " / " -%}
+        {%- endfor -%}
+      </p>
+      <p>&copy; {{ site.time | date: "%Y" }} {{ person }}</p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+# Career notes merged with published posts into one list, newest first.
+# `date` is the label on the page. `sort` is YYYY-MM-DD.
+# Leave the list empty to show only posts. Do not invent jobs, talks, or awards.
+#
+# - date: "Oct 2026"
+#   sort: "2026-10-01"
+#   html: 'Gave a talk. <a href="https://example.com">Recording</a>'
+
+- date: "Sep 2026"
+  sort: "2026-09-27"
+  html: 'I went to <a href="https://2026.ieee-iros.org/">IROS 2026</a> with Moonlake, where our demo ran code-as-policy on layouts we had not staged before.'
+- date: "Jun 2026"
+  sort: "2026-06-01"
+  html: 'I joined <a href="https://moonlakeai.com">Moonlake AI</a> as a member of technical staff.'
+- date: "Jun 2023"
+  sort: "2023-06-01"
+  html: 'I joined <a href="https://www.fulfil.com/">Fulfil</a> as a senior robotics and controls engineer on the factory controls team, and stayed through June 2026.'
+- date: "2022"
+  sort: "2022-01-01"
+  html: 'I worked as a private equity analyst at <a href="https://www.global-infra.com/">Global Infrastructure Partners</a>.'
+- date: "Summer 2021"
+  sort: "2021-06-01"
+  html: 'I interned on product development for the <a href="https://www.jnjmedtech.com/en-US/products/robotics/ottava-robotic-surgical-system/">OTTAVA</a> surgical robot at Johnson & Johnson.'
+- date: "2021"
+  sort: "2021-05-01"
+  html: 'I finished an MSE in Robotics at <a href="https://www.grasp.upenn.edu/people/sheil-sarda/">Penn GRASP</a> and the <a href="https://fisher.wharton.upenn.edu/">Jerome Fisher M&T</a> program in computer science and economics.'
