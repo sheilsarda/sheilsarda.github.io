@@ -224,12 +224,19 @@ ul, ol {
   margin-bottom: 20px;
 }
 
-.research-thumb img {
+a.research-thumb {
+  text-decoration: none;
+}
+
+.research-thumb img,
+.research-thumb video {
   width: 10em;
   height: 10em;
   max-width: none;
   object-fit: cover;
+  object-position: center;
   display: block;
+  background: #111;
 }
 
 a.research-proj-title {

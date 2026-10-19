@@ -3,6 +3,7 @@ title: "The Planner Shouldn't Need to Care: System Design for Interoperable Sim 
 date: 2026-06-03
 slug: interoperable-sim-hardware-backends
 description: "Designing a sim bridge an on-device planner cannot tell from a real robot, and the three places the disguise leaks."
+thumb: /assets/posts/interoperable-sim-hardware-backends/fetch-push.jpg
 ---
 
 ![Sim bridge as an indistinguishable backend]({{ site.baseurl }}/assets/posts/interoperable-sim-hardware-backends/01-bridge-overview.png)
