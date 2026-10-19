@@ -1,5 +1,6 @@
 ---
 title: "Selling a robot you haven't finished building"
+thumb: /assets/posts/selling-and-gtm-in-robotics/fulfil-cell.jpg
 ---
 
 # Selling a robot you haven't finished building
@@ -9,6 +10,10 @@ title: "Selling a robot you haven't finished building"
 A grocery automation company has to sell a system before it is done. The mechanical design is frozen, the robots move, the demo runs. But the throughput number in the contract is a number the production system has never actually hit, because the production system does not fully exist yet. You are quoting a future state and committing to it in writing.
 
 This is the central tension of go-to-market at an early-stage robotics company. Two mechanisms make it survivable. The first is a clear ownership model for the sales motion, so the right person is on the hook at each stage. The second is a simulation stack that tells you, before you sign, what you can credibly put in the contract. The second one is the more important. The sim is not a side project that engineering runs for fun. It is the instrument that decides the SLA.
+
+![Fulfil ShopBots at dispense stations inside a grocery fulfilment cell]({{ site.baseurl }}/assets/posts/selling-and-gtm-in-robotics/fulfil-cell.jpg)
+
+*ShopBots, dispense stations, and the storage behind them. This is the cell whose throughput ends up in the contract. Photograph from [Fulfil's technology page](https://www.fulfil.com/technology).*
 
 I joined Fulfil after the latest generation of robots were mechanically complete. Fulfil is a Series B grocery automation company, founded in 2020, around a hundred people, headquartered in Mountain View. The product is five different robot types that work together to fulfil online grocery orders, deployed for clients including Kroger and Amazon Whole Foods. I came in on the factory controls team, the group responsible for making the machines move and turning a building full of hardware into a running fulfilment center. This post is about the two things I watched most closely from that seat: how the company sold systems that were still being built, and how the simulation infrastructure grew up to support those sales.
 

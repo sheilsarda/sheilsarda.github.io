@@ -2,6 +2,7 @@
 title: "From demonstrations to reinforcement learning for robot policies"
 date: 2026-10-07
 slug: six-ways-labs-train-manipulation-policies
+thumb: /assets/posts/six-ways-labs-train-manipulation-policies/pi0-laundry.jpg
 ---
 
 I went to IROS 2026 with Moonlake. Our demo ran code-as-policy on semi-repeatable tasks: the robot's program stayed fixed while SAM3 located the objects, so one script handled layouts we had not staged before. The workshops I sat in kept returning to one question: which parts of writing a task and a policy can a foundation model take over, and how much does that speed up reinforcement learning and supervised fine-tuning. The six ways labs train a manipulation policy come first, with the evidence I could check against each paper. The four places where IROS showed a foundation model taking over a step inside those methods come after, because each one lands inside the survey.
@@ -9,6 +10,10 @@ I went to IROS 2026 with Moonlake. Our demo ran code-as-policy on semi-repeatabl
 ## Six ways labs train a manipulation policy
 
 Robotics labs have converged on six ways to train a manipulation policy. I list them with the evidence I could check against each paper, and the IROS themes return once the map is drawn.
+
+![A π0 policy takes laundry from a dryer, across the room, and onto a folding table]({{ site.baseurl }}/assets/posts/six-ways-labs-train-manipulation-policies/pi0-laundry.jpg)
+
+*The first of the six is behavior cloning. This π0 policy takes laundry from the dryer to the table and folds it. Fig. 2 of Black et al., "π0: A Vision-Language-Action Flow Model for General Robot Control," Physical Intelligence, 2024, [arXiv:2410.24164](https://arxiv.org/abs/2410.24164).*
 
 | Method | Where it learns | What you need |
 | --- | --- | --- |

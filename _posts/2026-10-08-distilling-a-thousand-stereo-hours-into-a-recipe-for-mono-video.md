@@ -2,6 +2,7 @@
 title: "Distilling a thousand stereo hours into a recipe for mono video"
 date: 2026-10-08
 slug: distilling-a-thousand-stereo-hours-into-a-recipe-for-mono-video
+thumb: /assets/posts/distilling-a-thousand-stereo-hours-into-a-recipe-for-mono-video/humanego-tasks.jpg
 ---
 
 Suppose a data lab has two datasets:
@@ -12,6 +13,10 @@ Suppose a data lab has two datasets:
 The smaller collection gives us measurements we cannot obtain from every mono clip. The larger collection gives us more people, environments and interactions. I would use the stereo set to train and evaluate the estimators that process the mono set, then reconstruct selected scenes to produce additional supervision.
 
 The target is task-relevant geometry within measured error bounds. A monocular model can learn useful scale priors from stereo supervision, but some scenes remain ambiguous. We need to establish which outputs transfer to new cameras and environments before treating the larger collection as robot training data.
+
+![Four HumanEgo tasks: downstack cups, water flowers, serve bread, and adjust the table]({{ site.baseurl }}/assets/posts/distilling-a-thousand-stereo-hours-into-a-recipe-for-mono-video/humanego-tasks.jpg)
+
+*Downstack cups, water flowers, serve bread, adjust the table. Thirty minutes of Aria video per task, no robot data, and the hand tracker is what moves the success rate. Figure 3 of Wang et al., "HumanEgo: Zero-Shot Robot Learning from Minutes of Human Egocentric Videos," 2026, [arXiv:2605.24934](https://arxiv.org/abs/2605.24934).*
 
 ## Label quality changes the policy
 

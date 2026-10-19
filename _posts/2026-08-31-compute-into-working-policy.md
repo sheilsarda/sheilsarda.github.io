@@ -4,6 +4,7 @@ short_title: "Compute into a working policy"
 date: 2026-08-31
 slug: compute-into-working-policy
 description: "GaP (Chen et al., 2026) hands workcell integration engineering to coding agents and rehearses the result in simulation. A close read of the paper, its released code, and its LaTeX source, with thirteen research questions in the appendix."
+thumb: /assets/posts/compute-into-working-policy/cable-insertion-setup.jpg
 ---
 
 *GaP hands workcell integration to agents; its reliability certificate ends at the simulator wall.*
@@ -11,6 +12,10 @@ description: "GaP (Chen et al., 2026) hands workcell integration engineering to 
 Source paper: [GaP: A Graph-as-Policy Multi-Agent Self-Learning Harness for Variational Automation Tasks](https://arxiv.org/abs/2607.05369), Chen et al., 2026.
 
 Chen et al. name a real market segment. *Variational automation* is repeated robot work in a known workcell with bounded variation in object geometry and pose: groceries into baskets, cables into ports, a popcorn pan onto a burner. It sits between fixed automation, where an engineer prescribes the motion, and generalist robotics, where a model must handle scenes it has not seen. Their system, GaP, has coding agents decompose the task, pick perception, grasping, and planning skills from a library, and wire them into a typed computation graph. GaP rehearses the graph across sampled simulator scenes, the agents revise it from the recorded failures, and the finished policy runs through an interpreter with no LLM in the loop. The results are strong: success rates of 0.93 and above under pose variations that drop VLA baselines to 0.15, 18 of 20 on a physical popcorn task, 121 of 130 cable insertions.
+
+![Seven-port cable insertion: a UR arm and a case that shifts in position and yaw]({{ site.baseurl }}/assets/posts/compute-into-working-policy/cable-insertion-setup.jpg)
+
+*The cable task is a case that moves five centimeters and fifteen degrees, and a graph that has to find the port anyway. One hundred twenty-one of one hundred thirty insertions landed. Figure 3 of Chen et al., "GaP: A Graph-as-Policy Multi-Agent Self-Learning Harness for Variational Automation Tasks," 2026, [arXiv:2607.05369](https://arxiv.org/abs/2607.05369).*
 
 The paper's implicit question, can agents engineer reliable robot policies, is broader than the one its evidence answers: can agents do the integration engineering for a known workcell, given a catalog of human-built competence and a simulator that grades their work. Thirteen questions into the paper, its released code, and its arXiv LaTeX source, the narrower claim holds up. Its boundaries teach more than its headline numbers.
 
