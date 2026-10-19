@@ -3,9 +3,12 @@ title: "VLAs in Contact: The Need for Speed"
 date: 2026-05-31
 slug: vlas-in-contact
 description: "Initiating coverage on three failure modes stopping VLAs from closing the contact loop."
+thumb: /assets/posts/vlas-in-contact/favla-contact-tasks.jpg
 ---
 
-![Dual-system VLA architecture overview]({{ site.baseurl }}/assets/posts/vlas-in-contact/05a4b546-50f8-4ad7-aeec-198d1be462df_1194x271.png)
+![USB insertion, gear assembly, box flipping, and board wiping]({{ site.baseurl }}/assets/posts/vlas-in-contact/favla-contact-tasks.jpg)
+
+*USB insertion, gear assembly, flipping a box, wiping a board. The contact is the task. Figure 4 of Li, Yao, et al., "FAVLA: A Force-Adaptive Fast-Slow VLA model for Contact-Rich Robotic Manipulation," 2026, [arXiv:2602.23648](https://arxiv.org/abs/2602.23648).*
 
 ## Glossary of terms
 
@@ -27,6 +30,8 @@ description: "Initiating coverage on three failure modes stopping VLAs from clos
 
 The frequency gap between VLAs and contact controllers is 100–1000× and structurally inherent to current architectures. The frequency ceiling of control loops based purely on VLAs is real and acknowledged by model companies. A monolithic VLA runs a forward pass on the current image and instruction, then emits a single action. "Chunking" is a technique that changes the output from one action to a sequence of 50 future actions for instance. A robot can execute those actions at a faster control rate while a different controller prepares the next chunk.
 
+![Dual-system VLA architecture overview]({{ site.baseurl }}/assets/posts/vlas-in-contact/05a4b546-50f8-4ad7-aeec-198d1be462df_1194x271.png)
+
 This looks like it solves the problem until one realizes that chunks are committed plans, decided before the model observes what happens during their execution. The closed-loop reaction rate (rate at which the system can respond to an unexpected force spike) remains the slow forward-pass rate. Secondly, force/torque signals carry information vision categorically cannot supply. So even if you somehow ran a VLA at 1 kHz, the input modality is wrong for the task.
 
 ![FAVLA fast-slow architecture]({{ site.baseurl }}/assets/posts/vlas-in-contact/66b40054-971a-47e8-870d-0c804b45079c_698x538.png)
@@ -43,7 +48,7 @@ How does one decide what's right for the use case?
 
 **Do the controlling physical parameters vary at deployment vs training?** If yes, you need aggressive domain randomization, or explicit online adaptation. This covers unknown material properties, unknown friction / gravity, novel objects, etc.
 
-**Is the task safety-critical against an external standard?** If yes, the learned policy can propose but cannot enforce. You need a verified runtime-assurance wrapper (see [my previous blog post]({{ '/blog/vlas-in-safety-critical-applications/' | relative_url }})).
+**Is the task safety-critical against an external standard?** If yes, the learned policy can propose but cannot enforce. You need a verified runtime-assurance wrapper (see [my previous blog post]({{ site.baseurl }}/blog/vlas-in-safety-critical-applications/)).
 
 We'll cover each domain individually, and describe potential implementation approaches, trade offs, and alternatives to consider.
 
@@ -113,7 +118,7 @@ The meta question underlying this hunt to squash OOD errors is if learned polici
 
 The failure mode is that the policy issues a command which would work in isolation but violates an external safety or correctness constraint that the system has committed to upholding.
 
-For more on this problem and potential solutions, see [Is It Possible to Run a Vision-Language-Action Model in a Safety-Critical Loop?]({{ '/blog/vlas-in-safety-critical-applications/' | relative_url }}).
+For more on this problem and potential solutions, see [Is It Possible to Run a Vision-Language-Action Model in a Safety-Critical Loop?]({{ site.baseurl }}/blog/vlas-in-safety-critical-applications/).
 
 ## Conclusion
 

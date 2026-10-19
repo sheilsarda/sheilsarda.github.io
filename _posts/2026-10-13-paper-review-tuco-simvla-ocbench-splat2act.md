@@ -2,9 +2,14 @@
 title: "Paper review: TUCO, SimVLA, OCBench and Splat2Act"
 date: 2026-10-13
 slug: paper-review-tuco-simvla-ocbench-splat2act
+thumb: /assets/posts/paper-review-tuco-simvla-ocbench-splat2act/tuco-real-tasks.jpg
 ---
 
 Four papers from the first week of October 2026 ask the same question from different sides: why does a policy trained on simulated demonstrations so often fail on a real robot, and what fixes it? In our own co-training runs, adding scripted simulation episodes to real teleoperation data has so far made the real-robot policy worse, not better. So I read these papers for the specific fix each one offers. Each one changes a different property of the simulated data. TUCO changes which demonstrations you keep. SimVLA changes which states the data covers. OCBench changes how the demonstrations move. Splat2Act changes what the cameras see. Taken together, they turn "sim data doesn't transfer" into four separate questions you can test.
+
+![Real executions of stack-the-cube, insert-the-peg, and place-the-cupcake]({{ site.baseurl }}/assets/posts/paper-review-tuco-simvla-ocbench-splat2act/tuco-real-tasks.jpg)
+
+*Stack the cube, insert the peg, place the cupcake. These are the three real tasks in the table below, and the executions TUCO is scoring the simulated pool against. Figure 6 of Zhu et al., "TUCO: Curating Simulation Demonstrations for Sim-to-Real Robot Policy Co-Training," 2026, [arXiv:2610.05407](https://arxiv.org/abs/2610.05407).*
 
 ## TUCO: Curating Simulation Demonstrations for Sim-to-Real Robot Policy Co-Training
 
