@@ -4,6 +4,7 @@ short_title: "VLAs in safety-critical loops"
 date: 2026-05-07
 slug: vlas-in-safety-critical-applications
 description: "The intersection of sampling-based model predictive control (MPC) and control barrier functions (CBFs)."
+thumb: /assets/posts/vlas-in-safety-critical-applications/herengracht-crossing.mp4
 ---
 
 Should one ask a Vision-Language-Action model to drive an excavator?

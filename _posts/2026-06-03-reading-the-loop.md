@@ -4,6 +4,7 @@ short_title: "Reading the loop"
 date: 2026-06-03
 slug: model-scorecards
 description: "Three lenses on five companies, one pick, and where robot control as a video prediction problem actually pays off."
+thumb: /assets/posts/model-scorecards/pi-table-bussing.mp4
 ---
 
 ## Glossary

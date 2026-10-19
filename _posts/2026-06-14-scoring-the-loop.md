@@ -4,6 +4,7 @@ short_title: "Scoring the loop"
 date: 2026-06-14
 slug: scoring-the-loop
 description: "A MECE framework for grading robot foundation models on data economics, control economics, and capability, each with a single benchmark KPI, a filled-in scorecard across seven labs, and the end-markets each profile actually unlocks."
+thumb: /assets/posts/scoring-the-loop/dreamzero-pick.mp4
 ---
 
 ## Glossary

@@ -54,6 +54,7 @@ layout: default
     {% comment %}
       Optional post front matter:
       thumb: /assets/posts/example.png
+      A .mp4, .webm, or .mov thumb plays as a muted loop.
       links:
         - label: PDF
           url: https://example.com/paper.pdf
@@ -73,9 +74,14 @@ layout: default
 
     <article class="blog-entry">
       {% if thumb_src != "" %}
-      <div class="research-thumb">
+      {% assign thumb_ext = thumb_src | split: "?" | first | split: "." | last | downcase %}
+      <a class="research-thumb" href="{{ post.url | relative_url }}">
+        {% if thumb_ext == "mp4" or thumb_ext == "webm" or thumb_ext == "mov" %}
+        <video src="{{ thumb_src }}" autoplay loop muted playsinline></video>
+        {% else %}
         <img src="{{ thumb_src }}" alt="{{ post.title }}">
-      </div>
+        {% endif %}
+      </a>
       {% endif %}
       <a class="research-proj-title" href="{{ post.url | relative_url }}">{{ post.title }}</a>
       <p class="research-meta">
