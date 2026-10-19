@@ -1,0 +1,93 @@
+---
+layout: default
+---
+
+{% assign profile = site.data.profile %}
+{% assign photo = profile.photo | default: "" | strip %}
+{% assign credit = profile.credit | default: "" | strip %}
+{% assign email = profile.email | default: "" | strip %}
+{% assign hobbies = profile.hobbies | default: "" | strip %}
+{% assign cv = profile.cv | default: "" | strip %}
+
+<section id="profile">
+  {% if photo != "" %}
+  <div id="profile-pic">
+    <img src="{{ photo | relative_url }}" alt="{{ profile.name }}">
+    {% if credit != "" %}
+    <p class="photo-credit">{{ credit }}</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <h1 id="profile-name">{{ profile.name }}</h1>
+
+  {% if email != "" %}
+  <p id="profile-email">{{ email }}</p>
+  {% endif %}
+
+  {% if site.description != blank %}
+  <p>{{ site.description }}</p>
+  {% endif %}
+
+  {{ content }}
+
+  {% if hobbies != "" %}
+  <p>{{ hobbies }}</p>
+  {% endif %}
+
+  <p class="profile-links">
+    {%- assign link_sep = "" -%}
+    {%- if cv != "" -%}
+      <a href="{{ cv | relative_url }}">CV</a>
+      {%- assign link_sep = " / " -%}
+    {%- endif -%}
+    {%- for link in profile.links -%}
+      {{ link_sep }}<a href="{{ link.url }}"{% if link.url contains "://" %} target="_blank" rel="noopener"{% endif %}>{{ link.label }}</a>
+      {%- assign link_sep = " / " -%}
+    {%- endfor -%}
+  </p>
+</section>
+
+<section id="blog">
+  <h1>Blog</h1>
+  <div class="blog-list">
+    {% comment %}
+      Optional post front matter:
+      thumb: /assets/posts/example.png
+      links:
+        - label: PDF
+          url: https://example.com/paper.pdf
+    {% endcomment %}
+    {% for post in site.posts %}
+      {% assign thumb_src = "" %}
+      {% assign thumb_field = post.thumb | default: "" | strip %}
+      {% if thumb_field != "" %}
+        {% assign thumb_src = thumb_field | relative_url %}
+      {% else %}
+        {% assign src_parts = post.content | split: 'src="' %}
+        {% if src_parts.size > 1 %}
+          {% assign thumb_src = src_parts[1] | split: '"' | first %}
+        {% endif %}
+      {% endif %}
+      {% assign summary = post.description | default: "" | strip %}
+
+    <article class="blog-entry">
+      {% if thumb_src != "" %}
+      <div class="research-thumb">
+        <img src="{{ thumb_src }}" alt="{{ post.title }}">
+      </div>
+      {% endif %}
+      <a class="research-proj-title" href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      <p class="research-meta">
+        <b>{{ profile.name }}</b><br>
+        <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time><br>
+        {% if summary != "" %}{{ summary }}<br>{% endif %}
+        <a href="{{ post.url | relative_url }}">Post</a>
+        {%- for link in post.links -%}
+          , <a href="{{ link.url }}">{{ link.label }}</a>
+        {%- endfor -%}
+      </p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
